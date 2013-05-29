@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+# mapr-hive   This shell script takes care of starting and stopping mapr-hive-metastore service
+# It requires jps command
+#
+#
+### BEGIN INIT INFO
+# Provides: mapr-hive-metastore
+# Required-Start: $network 
+# Required-Stop: $network 
+# Default-Start:
+# Default-Stop:
+# Short-Description: start,status and stop mapr-hive-metastore
+### END INIT INFO
+
+
+
+## Source function library.
+#. /etc/rc.d/init.d/functions
+
+hive_pid() {
+  JPS_STRING=org.apache.hadoop.hive.metastore.HiveMetaStore
+  echo `jps -m |grep "$JPS_STRING" | awk '{print $1}'`
+}
+
+start() {
+  pid=$(hive_pid)
+  if [ -n "$pid" ]
+  then
+    echo "mapr-hive metastore is already running (pid: $pid)"
+  else
+    # Start hive-metastore
+    echo "Starting hive"
+    /bin/su mapr -c "/opt/mapr/bin/hive --service metastore > /opt/mapr/logs/hive-metastore.log 2>&1 &"
+  fi
+
+
+  return 0
+}
+
+stop() {
+  pid=$(hive_pid)
+  if [ -n "$pid" ]
+  then
+    echo "Stoping mapr-hive-metastore"
+    /bin/su mapr -c "/bin/kill $pid"
+
+  else
+    echo "mapr-hive-metastore is not running"
+  fi
+
+  return 0
+}
+
+case $1 in
+start)
+  start
+;;
+stop)
+  stop
+;;
+restart)
+  stop
+  start
+;;
+status)
+  pid=$(hive_pid)
+  if [ -n "$pid" ]
+  then
+    echo "mapr-hive-metastore is running with pid: $pid"
+  else
+    echo "mapr-hive-metastore is not running"
+  fi
+;;
+esac
+exit 0
+
