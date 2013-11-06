@@ -1,16 +1,16 @@
 #!/bin/bash
 #
-# mapr-hive   This shell script takes care of starting and stopping mapr-hive-metastore service
+# mapr-hive   This shell script takes care of starting and stopping mapr-hive-thrift2 service
 # It requires jps command
 #
 #
 ### BEGIN INIT INFO
-# Provides: mapr-hive-metastore
+# Provides: mapr-hive-thrift2
 # Required-Start: $network 
 # Required-Stop: $network 
-# Default-Start: 3 4 5
+# Default-Start: 3 4 5 
 # Default-Stop: 0 1 2 6
-# Short-Description: start,status and stop mapr-hive-metastore
+# Short-Description: start,status and stop mapr-hive-thrift2
 ### END INIT INFO
 
 
@@ -19,7 +19,7 @@
 #. /etc/rc.d/init.d/functions
 
 hive_pid() {
-  JPS_STRING=org.apache.hadoop.hive.metastore.HiveMetaStore
+  JPS_STRING=org.apache.hive.service.server.HiveServer2
   echo `jps -m |grep "$JPS_STRING" | awk '{print $1}'`
 }
 
@@ -27,11 +27,11 @@ start() {
   pid=$(hive_pid)
   if [ -n "$pid" ]
   then
-    echo "mapr-hive metastore is already running (pid: $pid)"
+    echo "mapr-hive thrift2 is already running (pid: $pid)"
   else
-    # Start hive-metastore
+    # Start hive-thrift2
     echo "Starting hive"
-    /bin/su mapr -c "/opt/mapr/bin/hive --service metastore > /opt/mapr/logs/hive-metastore.log 2>&1 &"
+    /bin/su mapr -c "/opt/mapr/bin/hive --service hiveserver2 > /opt/mapr/logs/hive-thrift2.log 2>&1 &"
   fi
 
 
@@ -42,11 +42,11 @@ stop() {
   pid=$(hive_pid)
   if [ -n "$pid" ]
   then
-    echo "Stoping mapr-hive-metastore"
+    echo "Stoping mapr-hive-thrift2"
     /bin/su mapr -c "/bin/kill $pid"
 
   else
-    echo "mapr-hive-metastore is not running"
+    echo "mapr-hive-thrift2 is not running"
   fi
 
   return 0
@@ -67,9 +67,9 @@ status)
   pid=$(hive_pid)
   if [ -n "$pid" ]
   then
-    echo "mapr-hive-metastore is running with pid: $pid"
-  else
-    echo "mapr-hive-metastore is not running"
+    echo "mapr-hive-thrift2 is running with pid: $pid"
+  ilse
+    echo "mapr-hive-thrift2 is not running"
   fi
 ;;
 esac
